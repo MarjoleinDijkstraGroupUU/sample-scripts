@@ -1,0 +1,68 @@
+#Run Parameters
+variable ext_temp equal 0.85                     #Specify the thermostat Temperature
+variable Nevery equal 20                         #Specify the distance (in timesteps) between samples for computing ensemble averages
+                                                        #  (Interval between samples in a block)
+variable Nrepeat equal 50                        #Specify the number of samples per output  of thermodynamic averages
+                                                        #  (Samples per block output)
+variable Nfreq equal ${Nevery}*${Nrepeat}        #Specify the dump interval (in timesteps)
+                                                        #  (Some people call these blocks)
+variable nrun equal 5000000                      #Specify the MD run length (in timesteps)
+variable Tdamp equal 0.45                       #Specify the Thermostat damping parameter (in time units ; not timesteps)
+variable cfg_seed equal 45232                    #Seed integer for generating the initial, random configuration
+variable vel_seed equal 87287                    #Seed integer for generating the initial, random velocities
+
+# System definition
+variable Nmols equal 10000
+variable density equal 0.9
+variable L equal (${Nmols}/${density})^(1.0/3.0)
+
+#System Volume
+boundary     p p p                                   #Specify Periodic boundary conditions at all system boundaries
+region       box block 0.0 ${L} 0.0 ${L} 0.0 ${L}    #Specify a cubic simulation box with dimensions L
+create_box   1 box                                   #Create the box
+create_atoms 1 random ${Nmols} ${cfg_seed} NULL      #Create an initial configuration randomly
+
+#Molecular Model
+# NOTE: This block must be after the "System Volume" section
+pair_style lj/cut 3.0
+pair_coeff 1 1 1.0 1.0                  #Pure Lennard-Jones, use sigma=1, epsilon=1
+mass       1 1.0                                   #Pure Lennard-Jones, use mass=1
+# Add tail correction for the potential energy and pressure
+pair_modify tail yes
+
+#Neighbor List
+#Specify the skin distance (padding beyond the cutoff)
+neighbor 0.4 bin
+#Adjust the default neighbor list:
+neigh_modify every 1 delay 5 check yes
+#Initial Velocities
+# Create an initial velocity distribution using the specified
+# external temperature
+velocity all create ${ext_temp} ${vel_seed} loop geom
+
+#Relax the initial configuration and velocities
+#  Energy tolerance = 1.0E-4
+#  Force tolerance = 1.0E-6
+#  Maximum number of iterations = 1000
+#  Maximum number of force/energy evaluations = 100000
+minimize 1.0E-4 1.0E-6 1000 100000
+
+#Ensemble Setup
+fix 1 all nvt temp ${ext_temp} ${ext_temp} ${Tdamp}
+# Previous line specifies: NVT ensemble, thermostatted by Nose-Hoover a chained thermostat, set at temperature $ext_temp
+
+#Output
+variable PotentialEnergy equal epair             #Call the intermolecular potential energy $epair
+variable Pressure equal press                    #Call the pressure $press
+variable Temperature equal temp                  #Call the instantaneous temperature $temp
+fix 2 all ave/time ${Nevery} ${Nrepeat} ${Nfreq} v_Temperature v_PotentialEnergy v_Pressure file ave.dens_${density}.out
+#Specify the interval between screen output of thermodynamic averages
+thermo          10000
+#  (MD step, temperature, potential energy, pressure)
+#Format for screen output of thermodynamics
+thermo_style    custom step temp epair press
+
+#Run it!
+run ${nrun}
+#Write the ending simulation conditions to a restart file
+write_restart in.nvt.dens_${density}
