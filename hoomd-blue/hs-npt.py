@@ -107,8 +107,10 @@ def main():
     boxmc = hoomd.hpmc.update.BoxMC(trigger=1, betaP=3.0)
     boxl = sim.state.box.Lx
     # These are the parameters that the box updater takes. `standard` means
-    # that the volumen will get updated as it is, instead of the logarithm
-    # of the volume (check documentation for all the other available options)
+    # that the volume will get updated as it is, instead of the logarithm
+    # of the volume as in conventional implementations of the NPT ensemble
+    # (check documentation for all the other available options)
+    # `delta` is the maximum volume displacement
     boxmc.volume = {"mode": "standard", "weight": 1.0, "delta": boxl / 4.0}
     sim.operations.integrator = mc
     sim.operations.updaters.append(boxmc)
