@@ -111,6 +111,7 @@ def main():
 
     # Equilibrate the system
     eq_timesteps = 500_000
+    # Add a displacement tuner with a target acceptance ratio of 0.4
     tune = hoomd.hpmc.tune.MoveSize.scale_solver(
         moves=["d"],
         target=0.4,
