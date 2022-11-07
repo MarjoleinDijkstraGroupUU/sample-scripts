@@ -159,7 +159,7 @@ def main():
 
     # We save information every 1000 MC steps
     gsd_writer = hoomd.write.GSD(
-        filename="tra1.gsd",
+        filename="trajectory.gsd",
         trigger=hoomd.trigger.Periodic(1_000),
         mode="xb",
         filter=hoomd.filter.All(),
