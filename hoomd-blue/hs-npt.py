@@ -90,7 +90,7 @@ def randomize_system(m: int):
 
 def main():
     # Create and instantiate the system
-    m = 8
+    m = 4
     sim = randomize_system(m)
 
     # Compute the volume fraction
@@ -101,7 +101,7 @@ def main():
 
     # We are now defining the integrator for hard-spheres
     mc = hoomd.hpmc.integrate.Sphere(default_d=0.2)
-    mc.shape["sphere"] = {"diameter": 1.0}
+    mc.shape["A"] = {"diameter": 1.0}
     # We want to sample the NPT ensemble, so we need to add a box rescaling
     # updater. Here `betaP` is the reduced pressure (check documentation)
     boxmc = hoomd.hpmc.update.BoxMC(trigger=1, betaP=3.0)
@@ -116,7 +116,7 @@ def main():
     # Define the tuners for displacement and box adjustment
     # which would correspond to an NPT ensemble simulation
     # `target` correspond to the target acceptance ratio for each type of move
-    eq_time = 1_000_000
+    eq_time = 750_000
     tune1 = hoomd.hpmc.tune.MoveSize.scale_solver(
         moves=["d"],
         target=0.4,

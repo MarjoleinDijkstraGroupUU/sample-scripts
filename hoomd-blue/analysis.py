@@ -14,6 +14,7 @@ for frame in traj:
     )
     density.append(new_density)
 
+# Show the mean value for the density
 print(np.mean(np.array(density)))
 
 fig, ax = plt.subplots(1, 1, figsize=(10, 6))
