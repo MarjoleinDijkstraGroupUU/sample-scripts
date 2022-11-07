@@ -123,7 +123,7 @@ def main():
         ),
     )
     sim.operations.tuners.append(tune)
-    print(f"Starting equilibration run...")
+    print("Starting equilibration run...")
     sim.run(eq_timesteps)
     # Always remove the tuner
     sim.operations.tuners.remove(tune)
@@ -144,7 +144,7 @@ def main():
         filename="trajectory.gsd", trigger=hoomd.trigger.Periodic(1000), mode="xb"
     )
     sim.operations.writers.append(gsd_writer)
-    print(f"Starting production run...")
+    print("Starting production run...")
     sim.run(1_000_000)
 
 
