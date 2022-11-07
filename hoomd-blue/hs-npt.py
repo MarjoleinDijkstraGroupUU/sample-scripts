@@ -68,12 +68,8 @@ def randomize_system(m: int):
     acceptance = mc.translate_moves[0] / sum(mc.translate_moves)
     print(f"Acceptance ratio: {acceptance}")
     # There shouldn't be any rotations
-    print(mc.rotate_moves)
+    assert sum(mc.rotate_moves) == 0
 
-    # Show the snapshot of the system
-    final_snapshot = sim.state.get_snapshot()
-    print(initial_snapshot.particles.position[0:4])
-    print(final_snapshot.particles.position[0:4])
     # Save the snapshot of the system
     file_path = Path("random.gsd")
 
@@ -83,7 +79,7 @@ def randomize_system(m: int):
     if file_path.exists():
         file_path.unlink()
 
-    hoomd.write.GSD.write(state=sim.state, filename="random.gsd", mode="xb")
+    hoomd.write.GSD.write(state=sim.state, filename=str(file_path.resolve()), mode="xb")
 
     return sim
 
