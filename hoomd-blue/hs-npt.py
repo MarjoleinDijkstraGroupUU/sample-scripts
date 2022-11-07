@@ -27,8 +27,8 @@ def create_system(m: int):
     snapshot.particles.N = n_particles
     snapshot.particles.position = position
     snapshot.particles.orientation = orientation
-    # This tells the system there is a monodisperse simulation because
-    # there is only one type of particles
+    # This tells the simulation object that there is only one type of 
+    # particles (monodisperse system)
     snapshot.particles.typeid = np.zeros((n_particles,))
     snapshot.particles.types = ["A"]
     # The box can have tilts and different sizes, check the documentation.
